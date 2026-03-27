@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Formulário de Classificação Teológica</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 24px;
+      line-height: 1.5;
+      background: #f7f7f9;
+      color: #222;
+    }
+
+    h1,
+    h2 {
+      color: #1f3b5b;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin-bottom: 18px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .question-title {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    label.option-label {
+      display: block;
+      margin: 10px 0;
+      cursor: pointer;
+      padding: 10px 12px;
+      border: 1px solid #d7deea;
+      border-radius: 10px;
+      background: #fafcff;
+    }
+
+    .option-main {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-weight: 600;
+    }
+
+    .option-explanation {
+      margin-left: 26px;
+      margin-top: 6px;
+      color: #4b5563;
+      font-size: 14px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 24px;
+    }
+
+    button {
+      border: none;
+      padding: 12px 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
+    button[type="button"] {
+      background: #1f3b5b;
+      color: white;
+    }
+
+    .secondary {
+      background: #e3e8ef;
+      color: #222;
+    }
+
+    #result {
+      margin-top: 28px;
+    }
+
+    .result-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fff;
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .bar-wrap {
+      height: 10px;
+      background: #e9edf3;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .bar {
+      height: 10px;
+      background: #406a94;
+      border-radius: 999px;
+    }
+
+    .error {
+      color: #b00020;
+      font-weight: bold;
+      margin-bottom: 16px;
+    }
+
+    .summary-box {
+      background: #eef5ff;
+      border-left: 5px solid #406a94;
+      padding: 14px 16px;
+      border-radius: 8px;
+      margin-bottom: 18px;
+    }
+
+    small {
+      color: #555;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Formulário de Classificação Teológica</h1>
+  <p>
+    Responda marcando uma alternativa por pergunta. Ao final, o sistema calculará a pontuação
+    nas classes:
+    <strong>Liberal</strong>,
+    <strong>Crítica/Existencial</strong>,
+    <strong>Neo-ortodoxa / Barthiana</strong>,
+    <strong>Reformada / Ortodoxa Protestante</strong>,
+    <strong>Clássica / Católica-Escolástica</strong> e
+    <strong>Pentecostal / Carismática</strong>.
+  </p>
+
+  <form id="theologyForm"></form>
+
+  <div class="actions">
+    <button type="button" onclick="calculateResult()">Calcular resultado</button>
+    <button type="button" class="secondary" onclick="resetForm()">Limpar respostas</button>
+  </div>
+
+  <div id="result"></div>
+
+  <script>
+    const classes = [
+      "Liberal",
+      "Crítica/Existencial",
+      "Neo-ortodoxa / Barthiana",
+      "Reformada / Ortodoxa Protestante",
+      "Clássica / Católica-Escolástica",
+      "Pentecostal / Carismática"
+    ];
+
+    const questions = [
+      {
+        id: "q1",
+        text: "1. Como conhecemos Deus principalmente?",
+        options: [
+          {
+            label: "A) Porque Deus mesmo decide se revelar.",
+            explanation: "Conhecemos Deus porque Ele toma a iniciativa de se mostrar.",
+            points: {
+              "Neo-ortodoxa / Barthiana": 2,
+              "Reformada / Ortodoxa Protestante": 1
+            }
+          },
+          {
+            label: "B) Pela revelação, com ajuda da razão e da tradição da Igreja.",
+            explanation: "Conhecemos Deus pela revelação, mas também com ajuda da razão e do ensino histórico da Igreja.",
+            points: {
+              "Clássica / Católica-Escolástica": 2
+            }
+          },
+          {
+            label: "C) Pela experiência pessoal e espiritual.",
+            explanation: "A experiência vivida é o principal caminho para perceber Deus.",
+            points: {
+              "Liberal": 1,
+              "Crítica/Existencial": 1,
+              "Pentecostal / Carismática": 2
+            }
+          }
+        ]
+      },
+      {
+        id: "q2",
+        text: "2. Como a revelação de Deus acontece?",
+        options: [
+          {
+            label: "A) Deus fala soberanamente, sem depender do ser humano.",
+            explanation: "A revelação acontece porque Deus quer, e não porque a pessoa produz isso.",
+            points: {
+              "Reformada / Ortodoxa Protestante": 2,
+              "Neo-ortodoxa / Barthiana": 1
+            }
+          },
+          {
+            label: "B) Ela acontece no encontro entre Deus e a resposta da pessoa.",
+            explanation: "A revelação não é só informação; ela envolve perceber Deus e responder a Ele.",
+            points: {
+              "Neo-ortodoxa / Barthiana": 2,
+              "Crítica/Existencial": 1
+            }
+          },
+          {
+            label: "C) Ela aparece na experiência humana de fé.",
+            explanation: "A revelação é percebida dentro da experiência religiosa das pessoas.",
+            points: {
+              "Liberal": 2,
+              "Clássica / Católica-Escolástica": 1,
+              "Pentecostal / Carismática": 1
+            }
+          }
+        ]
+      },
+      {
+        id: "q3",
+        text: "3. O que é a Bíblia?",
+        options: [
+          {
+            label: "A) Palavra de Deus confiável e normativa.",
+            explanation: "A Bíblia deve orientar a fé e a vida cristã.",
+            points: {
+              "Reformada / Ortodoxa Protestante": 2,
+              "Clássica / Católica-Escolástica": 1
+            }
+          },
+          {
+            label: "B) Testemunho por meio do qual Deus fala hoje.",
+            explanation: "A Bíblia é um testemunho que Deus usa para falar com a pessoa no presente.",
+            points: {
+              "Neo-ortodoxa / Barthiana": 2,
+              "Pentecostal / Carismática": 1
+            }
+          },
+          {
+            label: "C) Registro humano de experiências com Deus.",
+            explanation: "A Bíblia mostra como pessoas viveram e entenderam sua relação com Deus.",
+            points: {
+              "Crítica/Existencial": 2,
+              "Liberal": 1
+            }
+          }
+        ]
+      },
+      {
+        id: "q4",
+        text: "4. Ao interpretar a Bíblia, o mais importante é:",
+        options: [
+          {
+            label: "A) Buscar o significado original do texto.",
+            explanation: "O foco é entender o que o texto quis dizer de forma objetiva.",
+            points: {
+              "Reformada / Ortodoxa Protestante": 1,
+              "Clássica / Católica-Escolástica": 2
+            }
+          },
+          {
+            label: "B) Discernir quando Deus está falando por meio do texto.",
+            explanation: "O principal é perceber quando Deus usa a Escritura para falar no presente.",
+            points: {
+              "Neo-ortodoxa / Barthiana": 2,
+              "Crítica/Existencial": 1
+            }
+          },
+          {
+            label: "C) Entender como o texto toca a vida da pessoa.",
+            explanation: "O foco é compreender como o texto faz sentido para a existência e a experiência de fé.",
+            points: {
+              "Liberal": 2,
+              "Pentecostal / Carismática": 1
+            }
+          }
+        ]
+      },
+      {
+        id: "q5",
+        text: "5. Quem é Jesus Cristo?",
+        options: [
+          {
+            label: "A) Deus encarnado, de forma real e objetiva.",
+            explanation: "Jesus é realmente Deus que veio ao mundo como homem.",
+            points: {
+              "Reformada / Ortodoxa Protestante": 2,
+              "Clássica / Católica-Escolástica": 2
+            }
+          },
+          {
+            label: "B) A revelação decisiva de Deus que nos confronta.",
+            explanation: "Jesus mostra quem Deus é e chama a pessoa a responder a isso.",
+            points: {
+              "Neo-ortodoxa / Barthiana": 2,
+              "Crítica/Existencial": 1
+            }
+          },
+          {
+            label: "C) Um grande mestre espiritual e moral.",
+            explanation: "Jesus é visto principalmente como exemplo de vida e ensinamento.",
+            points: {
+              "Liberal": 2,
+              "Pentecostal / Carismática": 1
+            }
+          }
+        ]
+      },
+      {
+        id: "q6",
+        text: "6. A obra central de Cristo consiste em:",
+        options: [
+          {
+            label: "A) Salvar os pecadores diante de Deus.",
+            explanation: "Jesus veio para trazer salvação real ao ser humano.",
+            points: {
+              "Reformada / Ortodoxa Protestante": 2,
+              "Neo-ortodoxa / Barthiana": 1
+            }
+          },
+          {
+            label: "B) Abrir o caminho de reconciliação com Deus.",
+            explanation: "Jesus torna possível a vida com Deus, inclusive na vida da Igreja.",
+            points: {
+              "Clássica / Católica-Escolástica": 2,
+              "Pentecostal / Carismática": 1
+            }
+          },
+          {
+            label: "C) Inspirar uma nova forma de viver.",
+            explanation: "Jesus ensina um caminho de transformação ética e existencial.",
+            points: {
+              "Liberal": 2,
+              "Crítica/Existencial": 2
+            }
+          }
+        ]
+      },
+      {
+        id: "q7",
+        text: "7. Como você entende a condição humana?",
+        options: [
+          {
+            label: "A) O ser humano está profundamente marcado pelo pecado.",
+            explanation: "A pessoa precisa muito da graça de Deus para ser restaurada.",
+            points: {
+              "Reformada / Ortodoxa Protestante": 2,
+              "Neo-ortodoxa / Barthiana": 2
+            }
+          },
+          {
+            label: "B) O ser humano está ferido, mas ainda pode cooperar com o bem.",
+            explanation: "Mesmo com falhas, a pessoa ainda pode responder a Deus e fazer o bem.",
+            points: {
+              "Clássica / Católica-Escolástica": 2,
+              "Pentecostal / Carismática": 1
+            }
+          },
+          {
+            label: "C) O ser humano é basicamente bom, mas influenciado pelo meio.",
+            explanation: "Os maiores problemas vêm das condições da vida, da sociedade e das escolhas.",
+            points: {
+              "Liberal": 1,
+              "Crítica/Existencial": 2
+            }
+          }
+        ]
+      },
+      {
+        id: "q8",
+        text: "8. Como a salvação acontece principalmente?",
+        options: [
+          {
+            label: "A) Pela ação soberana de Deus.",
+            explanation: "A salvação depende apenas de Deus, e não do mérito humano.",
+            points: {
+              "Reformada / Ortodoxa Protestante": 2,
+              "Neo-ortodoxa / Barthiana": 1
+            }
+          },
+          {
+            label: "B) Pela graça de Deus com resposta humana.",
+            explanation: "Deus salva, mas a pessoa participa respondendo em fé e caminhada cristã.",
+            points: {
+              "Clássica / Católica-Escolástica": 2,
+              "Pentecostal / Carismática": 1
+            }
+          },
+          {
+            label: "C) Pela transformação interior da pessoa.",
+            explanation: "A salvação é vista principalmente como mudança profunda por dentro.",
+            points: {
+              "Liberal": 2,
+              "Crítica/Existencial": 2
+            }
+          }
+        ]
+      },
+      {
+        id: "q9",
+        text: "9. A oração é principalmente:",
+        options: [
+          {
+            label: "A) Submissão à vontade de Deus.",
+            explanation: "Orar é confiar em Deus e se render à vontade dEle.",
+            points: {
+              "Reformada / Ortodoxa Protestante": 2,
+              "Neo-ortodoxa / Barthiana": 1
+            }
+          },
+          {
+            label: "B) Participação na ação de Deus.",
+            explanation: "A oração coopera com aquilo que Deus está fazendo.",
+            points: {
+              "Clássica / Católica-Escolástica": 2
+            }
+          },
+          {
+            label: "C) Um meio pelo qual Deus pode gerar mudanças concretas.",
+            explanation: "A oração pode trazer efeitos reais e visíveis na vida.",
+            points: {
+              "Pentecostal / Carismática": 3,
+              "Liberal": 1,
+              "Crítica/Existencial": 1
+            }
+          }
+        ]
+      },
+      {
+        id: "q10",
+        text: "10. A fé é principalmente:",
+        options: [
+          {
+            label: "A) Confiança em Deus e em Sua Palavra.",
+            explanation: "Fé é confiar no que Deus diz e viver de acordo com isso.",
+            points: {
+              "Reformada / Ortodoxa Protestante": 1,
+              "Neo-ortodoxa / Barthiana": 1
+            }
+          },
+          {
+            label: "B) Um caminho vivido na Igreja e na resposta pessoal.",
+            explanation: "A fé é vivida com a comunidade e também com a resposta pessoal a Deus.",
+            points: {
+              "Clássica / Católica-Escolástica": 2,
+              "Crítica/Existencial": 2
+            }
+          },
+          {
+            label: "C) Uma experiência pessoal que produz efeitos concretos.",
+            explanation: "A fé é vivida de forma pessoal e pode gerar resultados na vida.",
+            points: {
+              "Pentecostal / Carismática": 3,
+              "Liberal": 1
+            }
+          }
+        ]
+      },
+      {
+        id: "q11",
+        text: "11. Quando pessoas têm opiniões diferentes sobre Deus, você acha que:",
+        options: [
+          {
+            label: "A) Existe uma verdade correta, mesmo que nem todos concordem.",
+            explanation: "A verdade sobre Deus é fixa, mesmo que as pessoas pensem diferente.",
+            points: {
+              "Reformada / Ortodoxa Protestante": 2,
+              "Neo-ortodoxa / Barthiana": 1
+            }
+          },
+          {
+            label: "B) Existe uma verdade, mas ela sempre é entendida de forma diferente pelas pessoas.",
+            explanation: "A verdade existe, mas cada pessoa a entende dentro da sua realidade.",
+            points: {
+              "Clássica / Católica-Escolástica": 1,
+              "Crítica/Existencial": 2
+            }
+          },
+          {
+            label: "C) Não existe uma única verdade, ela muda com o tempo e com as pessoas.",
+            explanation: "A verdade vai sendo construída conforme a história e a experiência humana.",
+            points: {
+              "Liberal": 2,
+              "Pentecostal / Carismática": 1
+            }
+          }
+        ]
+      },
+      {
+        id: "q12",
+        text: "12. A experiência religiosa deve ser entendida como:",
+        options: [
+          {
+            label: "A) Importante, mas avaliada pela fé recebida.",
+            explanation: "A experiência conta, mas não deve mandar sozinha.",
+            points: {
+              "Reformada / Ortodoxa Protestante": 1,
+              "Neo-ortodoxa / Barthiana": 1
+            }
+          },
+          {
+            label: "B) Parte da vida da Igreja e da ação de Deus nela.",
+            explanation: "A experiência religiosa faz parte da caminhada da comunidade de fé.",
+            points: {
+              "Clássica / Católica-Escolástica": 1,
+              "Pentecostal / Carismática": 3
+            }
+          },
+          {
+            label: "C) Elemento central para a fé.",
+            explanation: "A experiência pessoal é uma parte essencial da vida religiosa.",
+            points: {
+              "Liberal": 2,
+              "Crítica/Existencial": 2
+            }
+          }
+        ]
+      }
+    ];
+
+    function renderForm() {
+      const form = document.getElementById("theologyForm");
+      form.innerHTML = "";
+
+      questions.forEach((question) => {
+        const card = document.createElement("div");
+        card.className = "card";
+
+        const title = document.createElement("div");
+        title.className = "question-title";
+        title.textContent = question.text;
+        card.appendChild(title);
+
+        question.options.forEach((option, index) => {
+          const label = document.createElement("label");
+          label.className = "option-label";
+
+          const main = document.createElement("div");
+          main.className = "option-main";
+
+          const input = document.createElement("input");
+          input.type = "radio";
+          input.name = question.id;
+          input.value = index;
+
+          const textNode = document.createElement("span");
+          textNode.textContent = option.label;
+
+          main.appendChild(input);
+          main.appendChild(textNode);
+          label.appendChild(main);
+
+          const explanation = document.createElement("div");
+          explanation.className = "option-explanation";
+          explanation.textContent = option.explanation;
+          label.appendChild(explanation);
+
+          card.appendChild(label);
+        });
+
+        form.appendChild(card);
+      });
+    }
+
+    function calculateResult() {
+      const resultDiv = document.getElementById("result");
+      resultDiv.innerHTML = "";
+
+      const scores = {};
+      classes.forEach(cls => scores[cls] = 0);
+
+      const unanswered = [];
+
+      questions.forEach(question => {
+        const selected = document.querySelector(`input[name="${question.id}"]:checked`);
+        if (!selected) {
+          unanswered.push(question.text);
+          return;
+        }
+
+        const optionIndex = parseInt(selected.value, 10);
+        const points = question.options[optionIndex].points;
+
+        Object.keys(points).forEach(cls => {
+          scores[cls] += points[cls];
+        });
+      });
+
+      if (unanswered.length > 0) {
+        resultDiv.innerHTML = `
+          <div class="error">
+            Responda todas as perguntas antes de calcular o resultado.
+          </div>
+        `;
+        return;
+      }
+
+      const totalPoints = Object.values(scores).reduce((sum, value) => sum + value, 0);
+
+      const ranking = Object.entries(scores)
+        .map(([cls, score]) => ({
+          className: cls,
+          score,
+          percent: totalPoints > 0 ? ((score / totalPoints) * 100) : 0
+        }))
+        .sort((a, b) => b.score - a.score);
+
+      const dominant = ranking[0];
+      const secondary = ranking[1];
+
+      const summary = document.createElement("div");
+      summary.className = "summary-box";
+      summary.innerHTML = `
+        <strong>Perfil dominante:</strong> ${dominant.className} (${dominant.score} pontos)<br>
+        <strong>Perfil secundário:</strong> ${secondary.className} (${secondary.score} pontos)<br>
+        <small>
+          Se a diferença entre o primeiro e o segundo lugar for pequena, o perfil pode ser híbrido.
+        </small>
+      `;
+      resultDiv.appendChild(summary);
+
+      const title = document.createElement("h2");
+      title.textContent = "Ranking das classes";
+      resultDiv.appendChild(title);
+
+      ranking.forEach(item => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "result-item";
+
+        const left = document.createElement("div");
+        left.style.flex = "1";
+
+        const label = document.createElement("div");
+        label.innerHTML = `<strong>${item.className}</strong>`;
+
+        const detail = document.createElement("div");
+        detail.textContent = `${item.score} pontos • ${item.percent.toFixed(1)}%`;
+
+        const barWrap = document.createElement("div");
+        barWrap.className = "bar-wrap";
+
+        const bar = document.createElement("div");
+        bar.className = "bar";
+        bar.style.width = `${item.percent}%`;
+
+        barWrap.appendChild(bar);
+        left.appendChild(label);
+        left.appendChild(detail);
+        left.appendChild(barWrap);
+
+        wrapper.appendChild(left);
+        resultDiv.appendChild(wrapper);
+      });
+    }
+
+    function resetForm() {
+      document.getElementById("theologyForm").reset();
+      document.getElementById("result").innerHTML = "";
+    }
+
+    renderForm();
+  </script>
+</body>
+
+</html>
